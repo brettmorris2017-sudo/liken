@@ -691,8 +691,9 @@ function drawMap(){
 
   var wk = {};
   state.entries.forEach(function(e){ var k = weekKey(e.date); wk[k] = (wk[k]||0)+1; });
-  $("chartTime").innerHTML = "";
-  $("chartTime").appendChild(sparkline(Object.keys(wk).sort().map(function(k){ return [k, wk[k]]; })));
+  var tnode = $("chartTime");
+  tnode.innerHTML = "";
+  tnode.appendChild(sparkline(Object.keys(wk).sort().map(function(k){ return [k, wk[k]]; }), tnode.clientWidth));
 
   var tc = $("themeCloud"); tc.innerHTML = "";
   var trows = asRows(tags);
@@ -743,10 +744,10 @@ function donut(rows){
   box.appendChild(s);
   return box;
 }
-function sparkline(rows){
+function sparkline(rows, cw){
   var box = el("div");
   if (rows.length < 2){ box.appendChild(el("p","hint","Two weeks of entries draws the line.")); return box; }
-  var w=360, h=130, pad=26;
+  var w = Math.max(250, Math.min(820, cw || 560)), h = 130, pad = 26;
   var s = svg(w,h);
   var max = Math.max.apply(null, rows.map(function(r){ return r[1]; }));
   var stepX = (w - pad*2) / (rows.length - 1);
