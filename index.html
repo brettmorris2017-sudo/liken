@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Liken is a private study log. Write what you studied, what you noticed, and what you will do. Everything stays on your own device.">
+<meta name="color-scheme" content="light dark">
+<title>Liken: a private study log</title>
+<style>
+:root{
+  --ink:#1b1724; --ink2:#4a4458; --line:#e3dfeb; --bg:#faf8fd; --card:#ffffff;
+  --accent:#5C3A8E; --accent2:#7E57C2; --soft:#f1ecfa; --good:#2f7d5d; --warn:#9a4b2f;
+  --r:14px; --sh:0 1px 2px rgba(27,23,36,.06), 0 8px 24px rgba(27,23,36,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ink:#ece9f3; --ink2:#a9a2bb; --line:#2e2840; --bg:#141120; --card:#1c1830;
+         --soft:#241e3a; --sh:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink); font:16px/1.55 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 72px}
+header.top{padding:22px 0 10px}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,var(--accent2),var(--accent));flex:0 0 auto;
+  display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+h1{font-size:25px;margin:0;letter-spacing:.2px}
+.tag{color:var(--ink2);font-size:14px;margin:6px 0 0}
+nav{display:flex;gap:6px;overflow-x:auto;margin:16px 0 18px;padding-bottom:4px;scrollbar-width:thin}
+nav button{
+  flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink2);
+  padding:9px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer}
+nav button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--sh);margin:0 0 14px}
+.card h2{font-size:17px;margin:0 0 4px}
+.card h3{font-size:15px;margin:18px 0 6px}
+.hint{color:var(--ink2);font-size:13.5px;margin:0 0 12px}
+label{display:block;font-size:13px;font-weight:700;color:var(--ink2);margin:12px 0 5px;letter-spacing:.2px}
+input,textarea,select{
+  width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent2);outline-offset:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 180px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--accent);
+  background:var(--accent);color:#fff;font:inherit;font-weight:650;padding:10px 16px;border-radius:10px;cursor:pointer}
+.btn.sec{background:transparent;color:var(--accent2);border-color:var(--line)}
+.btn.warn{background:transparent;color:var(--warn);border-color:var(--line)}
+.btn:active{transform:translateY(1px)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.pill{display:inline-block;background:var(--soft);color:var(--accent);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:650;margin:0 6px 6px 0}
+.ref{display:inline-block;background:var(--accent);color:#fff;border-radius:7px;padding:2px 8px;font-size:12.5px;font-weight:700;margin:0 6px 6px 0}
+.entry{border-top:1px solid var(--line);padding:14px 0}
+.entry:first-of-type{border-top:0}
+.entry .meta{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.date{color:var(--ink2);font-size:13px;font-weight:650}
+.note{margin:8px 0 0;white-space:pre-wrap}
+.live{margin:6px 0 0;font-size:14.5px;color:var(--ink2)}
+.live b{color:var(--good)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:10px;margin:4px 0 2px}
+.stat{background:var(--soft);border-radius:12px;padding:11px 12px}
+.stat .n{font-size:22px;font-weight:750;line-height:1.1}
+.stat .l{font-size:12px;color:var(--ink2);font-weight:650}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+td,th{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px}
+.barrow{display:flex;align-items:center;gap:8px}
+.barfill{height:9px;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));min-width:3px}
+.msg{border-radius:10px;padding:10px 12px;font-size:14px;margin:12px 0 0}
+.msg.ok{background:rgba(47,125,93,.12);color:var(--good)}
+.msg.bad{background:rgba(154,75,47,.12);color:var(--warn)}
+.banner{background:var(--soft);border:1px dashed var(--accent2);border-radius:12px;padding:12px 14px;margin:0 0 14px;font-size:14px}
+.banner b{color:var(--accent)}
+.q{border-left:3px solid var(--accent2);padding:2px 0 2px 12px;margin:12px 0}
+.pair{background:var(--soft);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.pair .score{float:right;font-size:12px;color:var(--ink2);font-weight:700}
+a{color:var(--accent2)}
+footer{color:var(--ink2);font-size:13px;text-align:center;padding:26px 0 8px}
+svg text{fill:var(--ink2);font-size:11px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:420px){
+  h1{font-size:22px}
+  .card{padding:14px}
+  nav button{padding:8px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="mark">L</div>
+    <div>
+      <h1>Liken</h1>
+      <p class="tag">Write what you studied, what you noticed, and what you will do about it. Everything stays on this device.</p>
+    </div>
+  </div>
+  <nav id="nav" aria-label="Sections">
+    <button data-view="log" aria-current="true">Log</button>
+    <button data-view="map">Map</button>
+    <button data-view="connections">Connections</button>
+    <button data-view="questions">Questions</button>
+    <button data-view="week">Week</button>
+    <button data-view="data">Data</button>
+  </nav>
+</header>
+
+<main id="main">
+  <div id="sampleBanner" class="banner" hidden>
+    <b>This is a sample log</b> so you can see how Liken works. Add your own entry, or clear the sample on the Data tab.
+  </div>
+
+  <!-- LOG -->
+  <section id="view-log">
+    <div class="card">
+      <h2>New entry</h2>
+      <p class="hint">References can be typed any way you like: <code>1 Ne 3:7</code>, <code>Alma 32:21 to 27</code>, <code>D&amp;C 121:7, 9</code>, <code>Moses 7:18; Matt 5:14</code>. Liken reads the book, chapter and verses and files them for you.</p>
+      <form id="form" novalidate>
+        <div class="row">
+          <div>
+            <label for="f-date">Date</label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div style="flex:2 1 260px">
+            <label for="f-ref">What you studied</label>
+            <input type="text" id="f-ref" placeholder="1 Nephi 3:7; Alma 32:21 to 27" autocomplete="off">
+          </div>
+        </div>
+        <div id="refPreview" class="hint" style="margin:8px 0 0"></div>
+        <label for="f-note">What you noticed</label>
+        <textarea id="f-note" placeholder="The thing you actually saw today. Your own words, not a summary."></textarea>
+        <label for="f-live">How you will live it</label>
+        <textarea id="f-live" style="min-height:58px" placeholder="One action, small enough that you will really do it."></textarea>
+        <div class="row">
+          <div>
+            <label for="f-tags">Themes</label>
+            <input type="text" id="f-tags" placeholder="obedience, faith, prayer" autocomplete="off">
+          </div>
+          <div>
+            <label for="f-src">Source and link, optional</label>
+            <input type="text" id="f-src" placeholder="A talk or lesson, plus its link" autocomplete="off">
+          </div>
+        </div>
+        <div class="bar">
+          <button class="btn" type="submit">Save entry</button>
+          <button class="btn sec" type="reset">Clear form</button>
+        </div>
+        <div id="formMsg"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Your log <span id="logCount" class="date"></span></h2>
+      <div class="row" style="margin-bottom:6px">
+        <input type="search" id="search" placeholder="Search notes, references and themes" autocomplete="off">
+        <select id="filterVol">
+          <option value="">Every volume</option>
+        </select>
+      </div>
+      <div id="entries"></div>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section id="view-map" hidden>
+    <div class="card">
+      <h2>Map</h2>
+      <p class="hint">Where your study has actually gone, drawn from your own entries only.</p>
+      <div class="stats" id="mapStats"></div>
+      <h3>By volume</h3>
+      <div id="chartVol"></div>
+      <h3>Books you have been in</h3>
+      <div id="chartBooks"></div>
+      <h3>Entries by week</h3>
+      <div id="chartTime"></div>
+      <h3>Themes</h3>
+      <div id="themeCloud"></div>
+    </div>
+  </section>
+
+  <!-- CONNECTIONS -->
+  <section id="view-connections" hidden>
+    <div class="card">
+      <h2>Connections</h2>
+      <p class="hint">Liken compares every pair of entries and scores them: the same chapter counts most, then the same book, then shared themes, then words the two notes have in common. The strongest pairs come first.</p>
+      <div id="pairs"></div>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section id="view-questions" hidden>
+    <div class="card">
+      <h2>Questions</h2>
+      <p class="hint">Pick an entry. Liken turns it into questions pointed back at you, not at the text.</p>
+      <label for="qPick">Entry</label>
+      <select id="qPick"></select>
+      <div class="bar"><button class="btn" id="qGo">Give me questions</button><button class="btn sec" id="qCopy">Copy them</button></div>
+      <div id="qOut"></div>
+    </div>
+  </section>
+
+  <!-- WEEK -->
+  <section id="view-week" hidden>
+    <div class="card">
+      <h2>Weekly review</h2>
+      <p class="hint">The last seven days, and what the week is telling you.</p>
+      <div class="stats" id="weekStats"></div>
+      <div id="weekBody"></div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section id="view-data" hidden>
+    <div class="card">
+      <h2>Your data</h2>
+      <p class="hint">Liken has no account and no server. Your log lives in this browser on this device. Export it to keep a copy, or to move it somewhere else.</p>
+      <div class="bar">
+        <button class="btn" id="expJson">Export JSON</button>
+        <button class="btn sec" id="expMd">Export Markdown</button>
+      </div>
+      <h3>Import a JSON export</h3>
+      <p class="hint">Choose a file, or paste the JSON below. Liken checks it before it touches your log and tells you exactly what is wrong if anything is.</p>
+      <input type="file" id="impFile" accept=".json,application/json">
+      <label for="impText">Or paste JSON</label>
+      <textarea id="impText" placeholder='{"app":"liken","entries":[ ... ]}'></textarea>
+      <div class="bar">
+        <button class="btn" id="impMerge">Import and merge</button>
+        <button class="btn sec" id="impReplace">Import and replace</button>
+      </div>
+      <div id="impMsg"></div>
+      <h3>Sample and reset</h3>
+      <div class="bar">
+        <button class="btn sec" id="loadSample">Load the sample log</button>
+        <button class="btn warn" id="wipe">Delete everything</button>
+      </div>
+      <div id="dataMsg"></div>
+    </div>
+    <div class="card">
+      <h2>What Liken does not do</h2>
+      <p class="hint" style="margin:0">It stores no scripture text and reproduces none. It holds your references, your words and your themes. It asks for no account, sends nothing anywhere, needs no key, and works with the network off.</p>
+    </div>
+  </section>
+</main>
+
+<footer>Liken. Your log, your device.</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- canon: 87 book names across the five standard works ---------- */
+var VOLS = {
+  ot:"Old Testament", nt:"New Testament", bom:"Book of Mormon",
+  dc:"Doctrine and Covenants", pgp:"Pearl of Great Price"
+};
+/* [display, volume, extra aliases] */
+var BOOKS = [
+ ["Genesis","ot","gen|ge|gn"],
+ ["Exodus","ot","exod|exo|ex"],
+ ["Leviticus","ot","lev|lv"],
+ ["Numbers","ot","num|nm|nu"],
+ ["Deuteronomy","ot","deut|deu|dt"],
+ ["Joshua","ot","josh|jos"],
+ ["Judges","ot","judg|jdg"],
+ ["Ruth","ot","rth"],
+ ["1 Samuel","ot","1 sam|1sam|1 sa|i samuel"],
+ ["2 Samuel","ot","2 sam|2sam|2 sa|ii samuel"],
+ ["1 Kings","ot","1 kgs|1kgs|1 ki|i kings"],
+ ["2 Kings","ot","2 kgs|2kgs|2 ki|ii kings"],
+ ["1 Chronicles","ot","1 chr|1chr|1 ch"],
+ ["2 Chronicles","ot","2 chr|2chr|2 ch"],
+ ["Ezra","ot","ezr"],
+ ["Nehemiah","ot","neh"],
+ ["Esther","ot","esth|est"],
+ ["Job","ot",""],
+ ["Psalms","ot","psalm|psa|pss|ps"],
+ ["Proverbs","ot","prov|prv|pr"],
+ ["Ecclesiastes","ot","eccles|eccl|ecc"],
+ ["Song of Solomon","ot","song of songs|songs|song|sos"],
+ ["Isaiah","ot","isa"],
+ ["Jeremiah","ot","jer"],
+ ["Lamentations","ot","lam"],
+ ["Ezekiel","ot","ezek|ezk|eze"],
+ ["Daniel","ot","dan|dn"],
+ ["Hosea","ot","hos"],
+ ["Joel","ot","joe"],
+ ["Amos","ot","amo"],
+ ["Obadiah","ot","obad|oba"],
+ ["Jonah","ot","jnh|jon"],
+ ["Micah","ot","mic"],
+ ["Nahum","ot","nah"],
+ ["Habakkuk","ot","hab|hbk"],
+ ["Zephaniah","ot","zeph|zep"],
+ ["Haggai","ot","hag|hg"],
+ ["Zechariah","ot","zech|zec"],
+ ["Malachi","ot","mal"],
+ ["Matthew","nt","matt|mat|mt"],
+ ["Mark","nt","mrk|mk"],
+ ["Luke","nt","lk|luk"],
+ ["John","nt","jhn|jn"],
+ ["Acts","nt","act"],
+ ["Romans","nt","rom|rm"],
+ ["1 Corinthians","nt","1 cor|1cor|1 co"],
+ ["2 Corinthians","nt","2 cor|2cor|2 co"],
+ ["Galatians","nt","gal"],
+ ["Ephesians","nt","eph"],
+ ["Philippians","nt","philip|phil|php"],
+ ["Colossians","nt","col"],
+ ["1 Thessalonians","nt","1 thess|1thess|1 thes|1 th"],
+ ["2 Thessalonians","nt","2 thess|2thess|2 thes|2 th"],
+ ["1 Timothy","nt","1 tim|1tim|1 ti"],
+ ["2 Timothy","nt","2 tim|2tim|2 ti"],
+ ["Titus","nt","tit"],
+ ["Philemon","nt","philem|phlm"],
+ ["Hebrews","nt","heb"],
+ ["James","nt","jas|jms"],
+ ["1 Peter","nt","1 pet|1pet|1 pe|1 pt"],
+ ["2 Peter","nt","2 pet|2pet|2 pe|2 pt"],
+ ["1 John","nt","1 jn|1jn|1 jhn|i john"],
+ ["2 John","nt","2 jn|2jn|ii john"],
+ ["3 John","nt","3 jn|3jn|iii john"],
+ ["Jude","nt","jde"],
+ ["Revelation","nt","revelations|rev"],
+ ["1 Nephi","bom","1 nephi|1nephi|1 ne|1ne|i nephi"],
+ ["2 Nephi","bom","2 nephi|2nephi|2 ne|2ne|ii nephi"],
+ ["Jacob","bom","jac"],
+ ["Enos","bom",""],
+ ["Jarom","bom","jar"],
+ ["Omni","bom","omn"],
+ ["Words of Mormon","bom","w of m|wofm|wom"],
+ ["Mosiah","bom","mosi|msh"],
+ ["Alma","bom",""],
+ ["Helaman","bom","hel"],
+ ["3 Nephi","bom","3 nephi|3nephi|3 ne|3ne|iii nephi"],
+ ["4 Nephi","bom","4 nephi|4nephi|4 ne|4ne|iv nephi"],
+ ["Mormon","bom","morm|mrm"],
+ ["Ether","bom","eth"],
+ ["Moroni","bom","moro|mni"],
+ ["Doctrine and Covenants","dc","doctrine & covenants|d&c|d and c|dc"],
+ ["Moses","pgp","mose"],
+ ["Abraham","pgp","abra|abr"],
+ ["Joseph Smith Matthew","pgp","joseph smith matthew|js matthew|js m|jsm"],
+ ["Joseph Smith History","pgp","joseph smith history|js history|js h|jsh"],
+ ["Articles of Faith","pgp","articles of faith|a of f|aoff|aof"]
+];
+
+var ALIASES = [];
+BOOKS.forEach(function(b){
+  var list = [b[0].toLowerCase()];
+  if (b[2]) list = list.concat(b[2].split("|"));
+  list.forEach(function(a){ ALIASES.push({a:norm(a), book:b[0], vol:b[1]}); });
+});
+ALIASES.sort(function(x,y){ return y.a.length - x.a.length; });
+var ALIAS_RE = new RegExp("(" + ALIASES.map(function(o){ return esc(o.a); }).join("|") + ")", "g");
+var ALIAS_MAP = {};
+ALIASES.forEach(function(o){ if(!ALIAS_MAP[o.a]) ALIAS_MAP[o.a] = o; });
+
+var LONGDASH = new RegExp("[" + String.fromCharCode(0x2013, 0x2014, 0x2212) + "]", "g");
+function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function norm(s){
+  return String(s).toLowerCase()
+    .replace(LONGDASH, "-")
+    .replace(/[.’']/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* ---------- reference parser ---------- */
+function parseRefs(input){
+  var out = { refs:[], errors:[] };
+  var raw = String(input || "").trim();
+  if (!raw) return out;
+  var s = norm(raw);
+
+  var hits = [], m;
+  ALIAS_RE.lastIndex = 0;
+  while ((m = ALIAS_RE.exec(s)) !== null){
+    var start = m.index, end = start + m[0].length;
+    var beforeOk = start === 0 || /[^a-z0-9]/.test(s.charAt(start-1));
+    var afterOk  = end >= s.length || /[^a-z]/.test(s.charAt(end));
+    if (beforeOk && afterOk) hits.push({ start:start, end:end, key:m[0] });
+  }
+  /* drop hits that sit inside an earlier, longer hit */
+  hits.sort(function(a,b){ return a.start - b.start || b.end - a.end; });
+  var kept = [];
+  hits.forEach(function(h){
+    var last = kept[kept.length-1];
+    if (last && h.start < last.end) return;
+    kept.push(h);
+  });
+
+  if (!kept.length){
+    out.errors.push('No book name found in "' + raw + '". Try something like 1 Nephi 3:7.');
+    return out;
+  }
+  if (kept[0].start > 0 && /[a-z0-9]/.test(s.slice(0, kept[0].start))){
+    out.errors.push('Ignored "' + s.slice(0, kept[0].start).trim() + '" before the first book name.');
+  }
+
+  kept.forEach(function(h, i){
+    var info = ALIAS_MAP[h.key];
+    var seg = s.slice(h.end, i+1 < kept.length ? kept[i+1].start : s.length);
+    seg = seg.replace(/\bto\b/g, "-").replace(/[;&]+\s*$/, "").trim();
+    if (!seg){
+      out.refs.push(mkRef(info, "", ""));
+      return;
+    }
+    var parts = seg.split(";");
+    var any = false;
+    parts.forEach(function(p){
+      p = p.trim().replace(/^[:,\s]+|[,\s]+$/g, "");
+      if (!p) return;
+      if (p.indexOf(":") > -1){
+        var bits = p.split(":");
+        var ch = (bits[0].match(/\d+/) || [""])[0];
+        var vs = cleanVerses(bits.slice(1).join(":"));
+        if (ch){ out.refs.push(mkRef(info, ch, vs)); any = true; }
+        else out.errors.push('Could not read a chapter in "' + info.book + " " + p + '".');
+      } else {
+        p.split(",").forEach(function(c){
+          var ch2 = (c.match(/\d+/) || [""])[0];
+          if (ch2){ out.refs.push(mkRef(info, ch2, "")); any = true; }
+        });
+        if (!/\d/.test(p)) out.errors.push('Could not read "' + p.trim() + '" after ' + info.book + ".");
+      }
+    });
+    if (!any && !out.refs.some(function(r){ return r.book === info.book; })) out.refs.push(mkRef(info, "", ""));
+  });
+  return out;
+}
+function cleanVerses(v){
+  var t = String(v).replace(/[^0-9,\-\s]/g, " ").replace(/\s*-\s*/g, "-").replace(/\s*,\s*/g, ", ")
+          .replace(/\s+/g, " ").replace(/^[,\s]+|[,\s-]+$/g, "").trim();
+  return t;
+}
+function mkRef(info, ch, vs){
+  return { book:info.book, vol:info.vol, chapter:ch ? String(ch) : "", verses:vs || "" };
+}
+function refText(r){
+  return r.book + (r.chapter ? " " + r.chapter : "") + (r.verses ? ":" + r.verses : "");
+}
+
+/* ---------- storage ---------- */
+var KEY = "liken.v1";
+var state = { entries:[], sample:false };
+
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY);
+    if (raw){
+      var o = JSON.parse(raw);
+      if (o && Array.isArray(o.entries)){ state.entries = o.entries; state.sample = !!o.sample; return; }
+    }
+  }catch(e){ /* private mode or bad data: run from memory */ }
+  state.entries = sampleEntries();
+  state.sample = true;
+  save();
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify({ app:"liken", version:1, sample:state.sample, entries:state.entries })); }
+  catch(e){ /* nothing to do: the session still works in memory */ }
+}
+function uid(){ return "e" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ---------- sample log, written so a stranger sees it working at once ---------- */
+function dayStr(back){
+  var d = new Date(); d.setDate(d.getDate() - back);
+  return d.toISOString().slice(0,10);
+}
+function sampleEntries(){
+  var s = [
+    [1,"1 Nephi 3:7","Willingness came before the plan did. He said he would go before he knew how it would work.","Say yes to one assignment today before I have the whole route worked out.","obedience, courage",""],
+    [2,"Alma 32:27 to 29","The experiment is on the desire, not on certainty. A particle of willingness is treated as enough to start.","Give ten minutes of real attention to the thing I keep putting off.","faith, patience",""],
+    [4,"Mosiah 4:27","Diligence and order are named in the same breath. Speed without order is not diligence.","Pick three things for tomorrow and leave the rest off the list.","diligence, order",""],
+    [5,"Matthew 5:14 to 16","The light is not asked to be brighter. It is asked to be uncovered.","Stop editing one thing I was going to say and just say it plainly.","discipleship, courage",""],
+    [7,"Doctrine and Covenants 121:7, 9","The promise is about duration, not removal. A small moment is still a moment.","When the afternoon turns hard, name it as short out loud.","adversity, patience",""],
+    [9,"Moses 7:18","Unity is described in concrete terms, not warm ones: one heart, one mind, no poor among them.","Ask one person what they actually need this week.","unity, charity",""],
+    [11,"Ether 12:27","Weakness is presented as the appointed meeting place, not the obstacle.","Take the weak spot I avoid and do the easiest version of it today.","grace, humility",""],
+    [13,"Psalms 27:14","Waiting is given as an action with a posture, not as passing time.","Sit still for five minutes before deciding the thing I keep rushing.","patience, courage",""]
+  ];
+  return s.map(function(r){
+    var p = parseRefs(r[1]);
+    return { id:uid(), date:dayStr(r[0]), refInput:r[1], refs:p.refs,
+             note:r[2], live:r[3], tags:splitTags(r[4]), src:r[5] };
+  });
+}
+function splitTags(t){
+  return String(t||"").split(",").map(function(x){ return x.trim().toLowerCase(); }).filter(Boolean);
+}
+
+/* ---------- small helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, txt){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (txt != null) n.textContent = txt;
+  return n;
+}
+function fmtDate(iso){
+  var p = String(iso).split("-");
+  if (p.length !== 3) return iso;
+  var d = new Date(+p[0], +p[1]-1, +p[2]);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" });
+}
+function msg(box, text, ok){
+  var n = $(box); n.innerHTML = "";
+  if (!text) return;
+  n.appendChild(el("div", "msg " + (ok ? "ok" : "bad"), text));
+}
+function sorted(){
+  return state.entries.slice().sort(function(a,b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+}
+function linkify(s){
+  var frag = document.createDocumentFragment();
+  var re = /(https?:\/\/[^\s]+)/g, last = 0, m;
+  while ((m = re.exec(s)) !== null){
+    if (m.index > last) frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+    var a = el("a", null, m[1]); a.href = m[1]; a.target = "_blank"; a.rel = "noopener noreferrer";
+    frag.appendChild(a); last = m.index + m[1].length;
+  }
+  if (last < s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+  return frag;
+}
+
+/* ---------- views ---------- */
+var VIEWS = ["log","map","connections","questions","week","data"];
+function show(v){
+  VIEWS.forEach(function(k){ $("view-" + k).hidden = (k !== v); });
+  Array.prototype.forEach.call($("nav").querySelectorAll("button"), function(b){
+    b.setAttribute("aria-current", b.dataset.view === v ? "true" : "false");
+  });
+  if (v === "map") drawMap();
+  if (v === "connections") drawPairs();
+  if (v === "questions") fillQPick();
+  if (v === "week") drawWeek();
+  window.scrollTo(0,0);
+}
+$("nav").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if (b) show(b.dataset.view);
+});
+
+/* ---------- log ---------- */
+$("f-date").value = dayStr(0);
+$("f-ref").addEventListener("input", function(){
+  var p = parseRefs(this.value);
+  var box = $("refPreview"); box.innerHTML = "";
+  if (!this.value.trim()) return;
+  p.refs.forEach(function(r){ box.appendChild(el("span","ref",refText(r))); });
+  p.errors.forEach(function(x){ box.appendChild(el("div","msg bad",x)); });
+});
+$("form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var refIn = $("f-ref").value.trim(), note = $("f-note").value.trim();
+  if (!refIn && !note){ msg("formMsg","Put in a reference or a note before saving.",false); return; }
+  var p = parseRefs(refIn);
+  if (refIn && !p.refs.length){ msg("formMsg", p.errors[0] || "That reference could not be read.", false); return; }
+  if (state.sample){ state.entries = []; state.sample = false; $("sampleBanner").hidden = true; }
+  state.entries.push({
+    id:uid(), date:$("f-date").value || dayStr(0), refInput:refIn, refs:p.refs,
+    note:note, live:$("f-live").value.trim(), tags:splitTags($("f-tags").value), src:$("f-src").value.trim()
+  });
+  save(); drawEntries(); fillVolFilter();
+  this.reset(); $("f-date").value = dayStr(0); $("refPreview").innerHTML = "";
+  msg("formMsg", "Saved. " + (p.errors.length ? p.errors[0] : "It is in your log below."), true);
+});
+$("form").addEventListener("reset", function(){
+  setTimeout(function(){ $("f-date").value = dayStr(0); $("refPreview").innerHTML = ""; msg("formMsg","",true); }, 0);
+});
+$("search").addEventListener("input", drawEntries);
+$("filterVol").addEventListener("change", drawEntries);
+
+function fillVolFilter(){
+  var sel = $("filterVol"), cur = sel.value;
+  sel.innerHTML = '<option value="">Every volume</option>';
+  var seen = {};
+  state.entries.forEach(function(e){ (e.refs||[]).forEach(function(r){ seen[r.vol] = 1; }); });
+  Object.keys(VOLS).forEach(function(v){
+    if (!seen[v]) return;
+    var o = el("option", null, VOLS[v]); o.value = v; sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+function drawEntries(){
+  var q = norm($("search").value), vol = $("filterVol").value, box = $("entries");
+  box.innerHTML = "";
+  var list = sorted().filter(function(e){
+    if (vol && !(e.refs||[]).some(function(r){ return r.vol === vol; })) return false;
+    if (!q) return true;
+    var hay = norm([e.note, e.live, e.src, (e.tags||[]).join(" "), (e.refs||[]).map(refText).join(" ")].join(" "));
+    return hay.indexOf(q) > -1;
+  });
+  $("logCount").textContent = list.length + (list.length === 1 ? " entry" : " entries");
+  if (!list.length){ box.appendChild(el("p","hint","Nothing here yet. Your first entry goes above.")); return; }
+  list.forEach(function(e){
+    var d = el("div","entry");
+    var meta = el("div","meta");
+    var left = el("div");
+    (e.refs||[]).forEach(function(r){ left.appendChild(el("span","ref",refText(r))); });
+    if (!(e.refs||[]).length && e.refInput) left.appendChild(el("span","ref",e.refInput));
+    meta.appendChild(left);
+    meta.appendChild(el("span","date",fmtDate(e.date)));
+    d.appendChild(meta);
+    if (e.note) d.appendChild(el("p","note",e.note));
+    if (e.live){
+      var lv = el("p","live"); lv.appendChild(el("b","", "Doing: ")); lv.appendChild(document.createTextNode(e.live));
+      d.appendChild(lv);
+    }
+    if ((e.tags||[]).length){
+      var tw = el("div",null); e.tags.forEach(function(t){ tw.appendChild(el("span","pill",t)); }); d.appendChild(tw);
+    }
+    if (e.src){ var sp = el("p","hint"); sp.style.margin="6px 0 0"; sp.appendChild(linkify(e.src)); d.appendChild(sp); }
+    var del = el("button","btn sec","Delete");
+    del.style.padding = "5px 11px"; del.style.fontSize = "13px"; del.style.marginTop = "10px";
+    del.addEventListener("click", function(){
+      state.entries = state.entries.filter(function(x){ return x.id !== e.id; });
+      save(); drawEntries(); fillVolFilter();
+    });
+    d.appendChild(del);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- map ---------- */
+function counts(pick){
+  var c = {};
+  state.entries.forEach(function(e){
+    var seen = {};
+    (e.refs||[]).forEach(function(r){
+      var k = pick(r); if (!k || seen[k]) return; seen[k] = 1; c[k] = (c[k]||0) + 1;
+    });
+  });
+  return c;
+}
+function asRows(obj){
+  return Object.keys(obj).map(function(k){ return [k, obj[k]]; })
+    .sort(function(a,b){ return b[1]-a[1] || (a[0] < b[0] ? -1 : 1); });
+}
+function barList(node, rows, labelFn){
+  node.innerHTML = "";
+  if (!rows.length){ node.appendChild(el("p","hint","Nothing logged yet.")); return; }
+  var max = rows[0][1];
+  var t = el("table"), tb = el("tbody");
+  rows.forEach(function(r){
+    var tr = el("tr");
+    var td1 = el("td", null, labelFn ? labelFn(r[0]) : r[0]); td1.style.width = "42%";
+    var td2 = el("td");
+    var wrap = el("div","barrow");
+    var fill = el("div","barfill"); fill.style.width = Math.round(r[1]/max*100) + "%";
+    wrap.appendChild(fill); wrap.appendChild(el("span","date",String(r[1])));
+    td2.appendChild(wrap);
+    tr.appendChild(td1); tr.appendChild(td2); tb.appendChild(tr);
+  });
+  t.appendChild(tb); node.appendChild(t);
+}
+function weekKey(iso){
+  var p = String(iso).split("-"); var d = new Date(+p[0], +p[1]-1, +p[2]);
+  if (isNaN(d)) return iso;
+  d.setDate(d.getDate() - d.getDay());
+  return d.toISOString().slice(0,10);
+}
+function drawMap(){
+  var books = counts(function(r){ return r.book; });
+  var vols  = counts(function(r){ return r.vol; });
+  var chaps = {};
+  state.entries.forEach(function(e){ (e.refs||[]).forEach(function(r){ if (r.chapter) chaps[r.book + " " + r.chapter] = 1; }); });
+  var tags = {};
+  state.entries.forEach(function(e){ (e.tags||[]).forEach(function(t){ tags[t] = (tags[t]||0)+1; }); });
+
+  var st = $("mapStats"); st.innerHTML = "";
+  [[state.entries.length,"entries"],[Object.keys(books).length,"books"],
+   [Object.keys(chaps).length,"chapters"],[Object.keys(vols).length,"of 5 volumes"],
+   [Object.keys(tags).length,"themes"],[streak(),"day streak"]].forEach(function(p){
+    var c = el("div","stat"); c.appendChild(el("div","n",String(p[0]))); c.appendChild(el("div","l",p[1])); st.appendChild(c);
+  });
+
+  var vrows = asRows(vols);
+  $("chartVol").innerHTML = "";
+  $("chartVol").appendChild(donut(vrows));
+  barList($("chartBooks"), asRows(books));
+
+  var wk = {};
+  state.entries.forEach(function(e){ var k = weekKey(e.date); wk[k] = (wk[k]||0)+1; });
+  $("chartTime").innerHTML = "";
+  $("chartTime").appendChild(sparkline(Object.keys(wk).sort().map(function(k){ return [k, wk[k]]; })));
+
+  var tc = $("themeCloud"); tc.innerHTML = "";
+  var trows = asRows(tags);
+  if (!trows.length) tc.appendChild(el("p","hint","No themes yet."));
+  trows.forEach(function(r){
+    var s = el("span","pill", r[0] + " " + r[1]);
+    s.style.fontSize = (12 + Math.min(8, r[1]*2)) + "px";
+    tc.appendChild(s);
+  });
+}
+function svg(w,h){
+  var s = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox","0 0 " + w + " " + h);
+  s.setAttribute("width","100%"); s.setAttribute("height",String(h));
+  s.setAttribute("role","img");
+  return s;
+}
+function sv(tag, attrs){
+  var n = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  Object.keys(attrs).forEach(function(k){ n.setAttribute(k, attrs[k]); });
+  return n;
+}
+var PAL = ["#5C3A8E","#7E57C2","#9b7fd4","#b9a3e3","#d6cbf1"];
+function donut(rows){
+  var box = el("div");
+  if (!rows.length){ box.appendChild(el("p","hint","Nothing logged yet.")); return box; }
+  var total = rows.reduce(function(a,r){ return a + r[1]; }, 0);
+  var s = svg(260,150), cx=75, cy=75, r=52, rr=32, acc=-Math.PI/2;
+  rows.forEach(function(row,i){
+    var frac = row[1]/total, a2 = acc + frac*Math.PI*2;
+    var big = frac > 0.5 ? 1 : 0;
+    var x1=cx+r*Math.cos(acc), y1=cy+r*Math.sin(acc), x2=cx+r*Math.cos(a2), y2=cy+r*Math.sin(a2);
+    var x3=cx+rr*Math.cos(a2), y3=cy+rr*Math.sin(a2), x4=cx+rr*Math.cos(acc), y4=cy+rr*Math.sin(acc);
+    var d = frac >= 0.999
+      ? "M " + (cx-r) + " " + cy + " A " + r + " " + r + " 0 1 1 " + (cx+r) + " " + cy +
+        " A " + r + " " + r + " 0 1 1 " + (cx-r) + " " + cy +
+        " M " + (cx-rr) + " " + cy + " A " + rr + " " + rr + " 0 1 0 " + (cx+rr) + " " + cy +
+        " A " + rr + " " + rr + " 0 1 0 " + (cx-rr) + " " + cy
+      : "M " + x1 + " " + y1 + " A " + r + " " + r + " 0 " + big + " 1 " + x2 + " " + y2 +
+        " L " + x3 + " " + y3 + " A " + rr + " " + rr + " 0 " + big + " 0 " + x4 + " " + y4 + " Z";
+    s.appendChild(sv("path",{ d:d, fill:PAL[i % PAL.length] }));
+    var ly = 26 + i*22;
+    s.appendChild(sv("rect",{ x:150, y:ly-9, width:11, height:11, rx:3, fill:PAL[i % PAL.length] }));
+    var t = sv("text",{ x:167, y:ly }); t.textContent = VOLS[row[0]] ? VOLS[row[0]] + " " + row[1] : row[0] + " " + row[1];
+    s.appendChild(t);
+    acc = a2;
+  });
+  box.appendChild(s);
+  return box;
+}
+function sparkline(rows){
+  var box = el("div");
+  if (rows.length < 2){ box.appendChild(el("p","hint","Two weeks of entries draws the line.")); return box; }
+  var w=560, h=140, pad=28;
+  var s = svg(w,h);
+  var max = Math.max.apply(null, rows.map(function(r){ return r[1]; }));
+  var stepX = (w - pad*2) / (rows.length - 1);
+  var pts = rows.map(function(r,i){
+    return [pad + i*stepX, h - pad - (r[1]/max) * (h - pad*2)];
+  });
+  s.appendChild(sv("line",{ x1:pad, y1:h-pad, x2:w-pad, y2:h-pad, stroke:"#9b7fd4", "stroke-width":1 }));
+  s.appendChild(sv("polyline",{
+    points: pts.map(function(p){ return p[0] + "," + p[1]; }).join(" "),
+    fill:"none", stroke:"#5C3A8E", "stroke-width":2.5, "stroke-linejoin":"round" }));
+  pts.forEach(function(p,i){
+    s.appendChild(sv("circle",{ cx:p[0], cy:p[1], r:3.5, fill:"#7E57C2" }));
+    var t = sv("text",{ x:p[0], y:p[1]-9, "text-anchor":"middle" }); t.textContent = String(rows[i][1]); s.appendChild(t);
+    if (i === 0 || i === pts.length-1 || rows.length < 7){
+      var lb = sv("text",{ x:p[0], y:h-pad+15, "text-anchor":"middle" });
+      lb.textContent = rows[i][0].slice(5).replace("-","/");
+      s.appendChild(lb);
+    }
+  });
+  box.appendChild(s);
+  return box;
+}
+
+/* ---------- connections ---------- */
+var STOP = {};
+("the a an and or of to in is was that this it for with as be by on not but they them he she his her you your i my we us our are were from which who whom what when then there their all any into upon unto shall will can do did done so if at no nor than too very about after again against because been before being between both each few further had has have having here how more most other out over own same some such only same up down off while why would could should may might one two".split(" "))
+  .forEach(function(w){ STOP[w] = 1; });
+
+function words(s){
+  return norm(s).replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(function(w){ return w.length > 3 && !STOP[w]; });
+}
+function pairScore(a,b){
+  var why = [], score = 0;
+  var ca = {}, cb = {};
+  (a.refs||[]).forEach(function(r){ if (r.chapter) ca[r.book + " " + r.chapter] = 1; });
+  (b.refs||[]).forEach(function(r){ if (r.chapter) cb[r.book + " " + r.chapter] = 1; });
+  var sameCh = Object.keys(ca).filter(function(k){ return cb[k]; });
+  if (sameCh.length){ score += 5 * sameCh.length; why.push("the same chapter: " + sameCh.join(", ")); }
+  var ba = {}, bb = {};
+  (a.refs||[]).forEach(function(r){ ba[r.book] = 1; });
+  (b.refs||[]).forEach(function(r){ bb[r.book] = 1; });
+  var sameBook = Object.keys(ba).filter(function(k){ return bb[k] && !sameCh.some(function(c){ return c.indexOf(k + " ") === 0; }); });
+  if (sameBook.length){ score += 3 * sameBook.length; why.push("the same book: " + sameBook.join(", ")); }
+  var ta = a.tags || [], tb = b.tags || [];
+  var sameTag = ta.filter(function(t){ return tb.indexOf(t) > -1; });
+  if (sameTag.length){ score += 2 * sameTag.length; why.push("shared themes: " + sameTag.join(", ")); }
+  var wa = {}, shared = {};
+  words(a.note + " " + a.live).forEach(function(w){ wa[w] = 1; });
+  words(b.note + " " + b.live).forEach(function(w){ if (wa[w]) shared[w] = 1; });
+  var sw = Object.keys(shared).slice(0,4);
+  if (sw.length){ score += sw.length; why.push("words in common: " + sw.join(", ")); }
+  var va = (a.refs||[])[0], vb = (b.refs||[])[0];
+  if (va && vb && va.vol !== vb.vol && score > 0){ score += 1; why.push("across two volumes"); }
+  return { score:score, why:why };
+}
+function drawPairs(){
+  var box = $("pairs"); box.innerHTML = "";
+  var list = sorted();
+  if (list.length < 2){ box.appendChild(el("p","hint","Two entries make the first connection.")); return; }
+  var out = [];
+  for (var i=0;i<list.length;i++){
+    for (var j=i+1;j<list.length;j++){
+      var r = pairScore(list[i], list[j]);
+      if (r.score > 0) out.push({ a:list[i], b:list[j], score:r.score, why:r.why });
+    }
+  }
+  out.sort(function(x,y){ return y.score - x.score; });
+  if (!out.length){ box.appendChild(el("p","hint","No overlap yet. Themes on your entries are the fastest way to create some.")); return; }
+  out.slice(0,12).forEach(function(p){
+    var d = el("div","pair");
+    d.appendChild(el("span","score", p.score + " points"));
+    var h = el("div");
+    (p.a.refs||[]).forEach(function(r){ h.appendChild(el("span","ref",refText(r))); });
+    h.appendChild(el("span","date"," with "));
+    (p.b.refs||[]).forEach(function(r){ h.appendChild(el("span","ref",refText(r))); });
+    d.appendChild(h);
+    d.appendChild(el("p","hint","Linked by " + p.why.join("; ") + "."));
+    var q = el("div","q");
+    q.appendChild(el("p","note", fmtDate(p.a.date) + ": " + (p.a.note || "no note")));
+    q.appendChild(el("p","note", fmtDate(p.b.date) + ": " + (p.b.note || "no note")));
+    d.appendChild(q);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- questions ---------- */
+function fillQPick(){
+  var sel = $("qPick"); sel.innerHTML = "";
+  var list = sorted();
+  if (!list.length){ sel.appendChild(el("option",null,"No entries yet")); return; }
+  list.forEach(function(e){
+    var label = ((e.refs||[]).map(refText).join(", ") || e.refInput || "untitled") + "  " + fmtDate(e.date);
+    var o = el("option", null, label); o.value = e.id; sel.appendChild(o);
+  });
+}
+function questionsFor(e){
+  var ref = (e.refs||[]).map(refText).join(", ") || e.refInput || "what you read";
+  var theme = (e.tags||[])[0] || "this";
+  var act = e.live ? e.live.replace(/\.$/,"") : "the thing you wrote down";
+  var qs = [
+    "You wrote this down about " + ref + ". What did you already suspect before you read it, and what is new?",
+    "Where in the last seven days did you behave as though " + theme + " were not true?",
+    "Who is the one person who would notice if you actually lived this, and what would they see?",
+    "What is the smallest version of " + act + " that you could not talk yourself out of?",
+    "If nothing about your week changes after this entry, what will that have cost you by next month?",
+    "What are you leaving out of your own note because it is uncomfortable to write?",
+    "Read this again in a year. What will the year have proved about whether you meant it?"
+  ];
+  if ((e.tags||[]).length > 1) qs.push("You filed this under " + e.tags.join(" and ") + ". Which of those is the one you are avoiding?");
+  if (!e.live) qs.push("You left the action blank. What does that tell you about where this landed?");
+  return qs.slice(0,5);
+}
+$("qGo").addEventListener("click", function(){
+  var id = $("qPick").value, e = state.entries.filter(function(x){ return x.id === id; })[0];
+  var box = $("qOut"); box.innerHTML = "";
+  if (!e){ box.appendChild(el("p","hint","Pick an entry first.")); return; }
+  var head = el("p","hint", "On " + ((e.refs||[]).map(refText).join(", ") || e.refInput) + ", " + fmtDate(e.date) + ".");
+  box.appendChild(head);
+  questionsFor(e).forEach(function(q,i){
+    var d = el("div","q"); d.appendChild(el("p","note",(i+1) + ". " + q)); box.appendChild(d);
+  });
+});
+$("qCopy").addEventListener("click", function(){
+  var id = $("qPick").value, e = state.entries.filter(function(x){ return x.id === id; })[0];
+  if (!e){ return; }
+  var text = questionsFor(e).map(function(q,i){ return (i+1) + ". " + q; }).join("\n");
+  copy(text, "qOut", "Questions copied.");
+});
+function copy(text, box, okMsg){
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.left = "-2000px";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); msg(box, okMsg, true); }
+    catch(e){ msg(box, "Could not reach the clipboard. Use an export on the Data tab instead.", false); }
+    document.body.removeChild(ta);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ msg(box, okMsg, true); }, fallback);
+  } else fallback();
+}
+
+/* ---------- week ---------- */
+function streak(){
+  var days = {};
+  state.entries.forEach(function(e){ days[e.date] = 1; });
+  var n = 0, d = new Date();
+  for (;;){
+    var k = d.toISOString().slice(0,10);
+    if (days[k]){ n++; d.setDate(d.getDate()-1); }
+    else if (n === 0 && k === dayStr(0)){ d.setDate(d.getDate()-1); }
+    else break;
+    if (n > 3650) break;
+  }
+  return n;
+}
+function drawWeek(){
+  var since = dayStr(6);
+  var wk = state.entries.filter(function(e){ return e.date >= since; });
+  var prev = state.entries.filter(function(e){ return e.date >= dayStr(13) && e.date < since; });
+  var books = {}, tags = {}, acts = [];
+  wk.forEach(function(e){
+    (e.refs||[]).forEach(function(r){ books[r.book] = 1; });
+    (e.tags||[]).forEach(function(t){ tags[t] = (tags[t]||0)+1; });
+    if (e.live) acts.push(e);
+  });
+  var st = $("weekStats"); st.innerHTML = "";
+  [[wk.length,"entries this week"],[prev.length,"the week before"],
+   [Object.keys(books).length,"books"],[acts.length,"actions written"],[streak(),"day streak"]].forEach(function(p){
+    var c = el("div","stat"); c.appendChild(el("div","n",String(p[0]))); c.appendChild(el("div","l",p[1])); st.appendChild(c);
+  });
+
+  var box = $("weekBody"); box.innerHTML = "";
+  if (!wk.length){
+    box.appendChild(el("p","hint","Nothing in the last seven days. One entry restarts the week."));
+    return;
+  }
+  var dir = wk.length > prev.length ? "up from " + prev.length : wk.length < prev.length ? "down from " + prev.length : "level with " + prev.length;
+  box.appendChild(el("p","note","You logged " + wk.length + " " + (wk.length===1?"entry":"entries") + " this week, " + dir + " last week, across " + Object.keys(books).length + " " + (Object.keys(books).length===1?"book":"books") + "."));
+
+  var trows = asRows(tags);
+  if (trows.length){
+    box.appendChild(el("h3",null,"What the week was about"));
+    var tw = el("div"); trows.forEach(function(r){ tw.appendChild(el("span","pill", r[0] + " " + r[1])); }); box.appendChild(tw);
+    box.appendChild(el("p","hint","The theme on top is " + trows[0][0] + ". That is the week whether you chose it or not."));
+  }
+  if (acts.length){
+    box.appendChild(el("h3",null,"What you said you would do"));
+    acts.forEach(function(e){
+      var d = el("div","q");
+      d.appendChild(el("p","note", e.live));
+      d.appendChild(el("p","hint", fmtDate(e.date) + ", from " + ((e.refs||[]).map(refText).join(", ") || e.refInput)));
+      box.appendChild(d);
+    });
+    box.appendChild(el("p","hint","Go down that list and mark honestly which ones happened. That is the review."));
+  } else {
+    box.appendChild(el("p","hint","No actions written this week. Notes without an action are the easiest habit to keep and the slowest to change anything."));
+  }
+  box.appendChild(el("h3",null,"Three questions for the week"));
+  [ "Which single entry from this week do you still think about unprompted?",
+    "What did you log because it was true, and what did you log because it was easy?",
+    "What is the one thing from this week you will carry into next week on purpose?"
+  ].forEach(function(q){ var d = el("div","q"); d.appendChild(el("p","note",q)); box.appendChild(d); });
+}
+
+/* ---------- data ---------- */
+function download(name, text, type){
+  try{
+    var blob = new Blob([text], { type:type });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    msg("dataMsg","Exported " + name + ".", true);
+  }catch(e){ msg("dataMsg","This browser blocked the download. Copy the log out of the paste box instead.", false); }
+}
+$("expJson").addEventListener("click", function(){
+  download("liken-" + dayStr(0) + ".json",
+    JSON.stringify({ app:"liken", version:1, exported:new Date().toISOString(), entries:state.entries }, null, 2),
+    "application/json");
+});
+$("expMd").addEventListener("click", function(){
+  var lines = ["# Liken log", "", "Exported " + dayStr(0) + ". " + state.entries.length + " entries.", ""];
+  sorted().forEach(function(e){
+    lines.push("## " + ((e.refs||[]).map(refText).join(", ") || e.refInput || "Entry"));
+    lines.push("*" + fmtDate(e.date) + "*");
+    lines.push("");
+    if (e.note){ lines.push(e.note); lines.push(""); }
+    if (e.live){ lines.push("**Doing:** " + e.live); lines.push(""); }
+    if ((e.tags||[]).length){ lines.push("Themes: " + e.tags.join(", ")); lines.push(""); }
+    if (e.src){ lines.push("Source: " + e.src); lines.push(""); }
+  });
+  download("liken-" + dayStr(0) + ".md", lines.join("\n"), "text/markdown");
+});
+
+function validate(text){
+  var o;
+  try{ o = JSON.parse(text); }
+  catch(err){ return { error:"That is not valid JSON. " + err.message }; }
+  if (!o || typeof o !== "object") return { error:"The file did not contain an object." };
+  var arr = Array.isArray(o) ? o : o.entries;
+  if (!Array.isArray(arr)) return { error:'No "entries" list in the file. A Liken export has {"app":"liken","entries":[...]}.' };
+  var good = [], bad = [];
+  arr.forEach(function(raw, i){
+    if (!raw || typeof raw !== "object"){ bad.push("row " + (i+1) + " is not an object"); return; }
+    var date = typeof raw.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? raw.date : null;
+    if (!date){ bad.push("row " + (i+1) + " has no usable date"); return; }
+    var refs = Array.isArray(raw.refs) ? raw.refs.filter(function(r){ return r && r.book; }) : [];
+    var refInput = typeof raw.refInput === "string" ? raw.refInput : "";
+    if (!refs.length && refInput) refs = parseRefs(refInput).refs;
+    var note = typeof raw.note === "string" ? raw.note : "";
+    if (!refs.length && !note){ bad.push("row " + (i+1) + " has neither a reference nor a note"); return; }
+    good.push({
+      id: typeof raw.id === "string" && raw.id ? raw.id : uid(),
+      date: date, refInput: refInput || refs.map(refText).join("; "), refs: refs,
+      note: note, live: typeof raw.live === "string" ? raw.live : "",
+      tags: Array.isArray(raw.tags) ? raw.tags.map(function(t){ return String(t).toLowerCase().trim(); }).filter(Boolean) : splitTags(raw.tags),
+      src: typeof raw.src === "string" ? raw.src : ""
+    });
+  });
+  if (!good.length) return { error:"Nothing could be imported. " + (bad.length ? bad.slice(0,3).join("; ") + "." : "") };
+  return { entries:good, skipped:bad };
+}
+function doImport(text, mode){
+  if (!String(text||"").trim()){ msg("impMsg","Choose a file or paste the JSON first.", false); return; }
+  var r = validate(text);
+  if (r.error){ msg("impMsg", r.error, false); return; }
+  if (mode === "replace"){ state.entries = r.entries; }
+  else {
+    var have = {}; state.entries.forEach(function(e){ have[e.date + "|" + (e.note||"") ] = 1; });
+    var added = r.entries.filter(function(e){ return !have[e.date + "|" + (e.note||"")]; });
+    state.entries = state.entries.concat(added);
+    r.added = added.length;
+  }
+  state.sample = false; $("sampleBanner").hidden = true;
+  save(); drawEntries(); fillVolFilter(); fillQPick();
+  var note = mode === "replace"
+    ? "Replaced your log with " + r.entries.length + " entries."
+    : "Merged " + r.added + " new " + (r.added === 1 ? "entry" : "entries") + ", skipping " + (r.entries.length - r.added) + " already present.";
+  if (r.skipped && r.skipped.length) note += " Left out " + r.skipped.length + ": " + r.skipped.slice(0,3).join("; ") + ".";
+  msg("impMsg", note, true);
+}
+$("impMerge").addEventListener("click", function(){ doImport($("impText").value, "merge"); });
+$("impReplace").addEventListener("click", function(){
+  if (state.entries.length && !state.sample && !confirm("Replace your whole log with this file?")) return;
+  doImport($("impText").value, "replace");
+});
+$("impFile").addEventListener("change", function(){
+  var f = this.files && this.files[0]; if (!f) return;
+  var fr = new FileReader();
+  fr.onload = function(){ $("impText").value = String(fr.result); msg("impMsg","File read. Now choose merge or replace.", true); };
+  fr.onerror = function(){ msg("impMsg","That file could not be read.", false); };
+  fr.readAsText(f);
+});
+$("loadSample").addEventListener("click", function(){
+  state.entries = sampleEntries(); state.sample = true; save();
+  $("sampleBanner").hidden = false;
+  drawEntries(); fillVolFilter(); fillQPick();
+  msg("dataMsg","Sample log loaded. Your first real entry clears it.", true);
+});
+$("wipe").addEventListener("click", function(){
+  if (!confirm("Delete every entry on this device? This cannot be undone.")) return;
+  state.entries = []; state.sample = false;
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  save(); drawEntries(); fillVolFilter(); fillQPick();
+  $("sampleBanner").hidden = true;
+  msg("dataMsg","Everything deleted.", true);
+});
+
+/* ---------- start ---------- */
+load();
+$("sampleBanner").hidden = !state.sample;
+fillVolFilter();
+drawEntries();
+fillQPick();
+</script>
+</body>
+</html>
