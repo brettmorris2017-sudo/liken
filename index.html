@@ -567,8 +567,12 @@ $("form").addEventListener("submit", function(e){
     note:note, live:$("f-live").value.trim(), tags:splitTags($("f-tags").value), src:$("f-src").value.trim()
   });
   save(); drawEntries(); fillVolFilter();
-  this.reset(); $("f-date").value = dayStr(0); $("refPreview").innerHTML = "";
-  msg("formMsg", "Saved. " + (p.errors.length ? p.errors[0] : "It is in your log below."), true);
+  var savedNote = "Saved. " + (p.errors.length ? p.errors[0] : "It is in your log below.");
+  this.reset();
+  setTimeout(function(){
+    $("f-date").value = dayStr(0); $("refPreview").innerHTML = "";
+    msg("formMsg", savedNote, true);
+  }, 0);
 });
 $("form").addEventListener("reset", function(){
   setTimeout(function(){ $("f-date").value = dayStr(0); $("refPreview").innerHTML = ""; msg("formMsg","",true); }, 0);
@@ -742,7 +746,7 @@ function donut(rows){
 function sparkline(rows){
   var box = el("div");
   if (rows.length < 2){ box.appendChild(el("p","hint","Two weeks of entries draws the line.")); return box; }
-  var w=560, h=140, pad=28;
+  var w=360, h=130, pad=26;
   var s = svg(w,h);
   var max = Math.max.apply(null, rows.map(function(r){ return r[1]; }));
   var stepX = (w - pad*2) / (rows.length - 1);
@@ -768,7 +772,7 @@ function sparkline(rows){
 
 /* ---------- connections ---------- */
 var STOP = {};
-("the a an and or of to in is was that this it for with as be by on not but they them he she his her you your i my we us our are were from which who whom what when then there their all any into upon unto shall will can do did done so if at no nor than too very about after again against because been before being between both each few further had has have having here how more most other out over own same some such only same up down off while why would could should may might one two".split(" "))
+("the a an and or of to in is was that this it for with as be by on not but they them he she his her you your i my we us our are were from which who whom what when then there their all any into upon unto shall will can do did done so if at no nor than too very about after again against because been before being between both each few further had has have having here how more most other out over own same some such only same up down off while why would could should may might one two thing things really just like also even still much many make makes made take takes keep keeps give gives come comes know knows think thinks today tomorrow week weeks month year years time times every".split(" "))
   .forEach(function(w){ STOP[w] = 1; });
 
 function words(s){
@@ -841,7 +845,8 @@ function fillQPick(){
 function questionsFor(e){
   var ref = (e.refs||[]).map(refText).join(", ") || e.refInput || "what you read";
   var theme = (e.tags||[])[0] || "this";
-  var act = e.live ? e.live.replace(/\.$/,"") : "the thing you wrote down";
+  var act = e.live ? e.live.replace(/\.$/,"") : "what you wrote down";
+  if (act) act = act.charAt(0).toLowerCase() + act.slice(1);
   var qs = [
     "You wrote this down about " + ref + ". What did you already suspect before you read it, and what is new?",
     "Where in the last seven days did you behave as though " + theme + " were not true?",
